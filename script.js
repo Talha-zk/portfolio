@@ -173,11 +173,15 @@ let mouseY = 0;
 let cursorX = 0;
 let cursorY = 0;
 
-document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    cursor.style.display = 'block';
-});
+// Only track mouse on non-touch devices
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+if (!isTouchDevice) {
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        cursor.style.display = 'block';
+    });
+}
 
 function animateCursor() {
     cursorX += (mouseX - cursorX) * 0.5;
@@ -188,10 +192,14 @@ function animateCursor() {
 
 animateCursor();
 
-// Hide cursor on mobile
-if (window.innerWidth <= 768) {
-    cursor.style.display = 'none';
+// Hide cursor on mobile and touch devices
+function checkIfMobile() {
+    const isMobile = window.innerWidth <= 768 || 'ontouchstart' in window;
+    if (isMobile) {
+        cursor.style.display = 'none';
+    }
 }
+checkIfMobile();
 
 // Navbar scroll effect is now handled in updateScrollEffects above
 
@@ -227,13 +235,26 @@ document.querySelectorAll('.contact-btn').forEach(btn => {
     });
 });
 
-// Prevent orientation warning on desktop
-if (window.innerWidth > 768) {
-    const orientationWarning = document.querySelector('.orientation-warning');
+// Hide orientation warning on all devices (causing issues)
+const orientationWarning = document.querySelector('.orientation-warning');
+if (orientationWarning) {
+    orientationWarning.style.display = 'none';
+}
+
+// Handle orientation changes and ensure cursor is hidden on mobile
+function handleResize() {
+    const isMobile = window.innerWidth <= 768;
+    if (cursor) {
+        cursor.style.display = isMobile ? 'none' : 'block';
+    }
+    // Ensure orientation warning stays hidden
     if (orientationWarning) {
         orientationWarning.style.display = 'none';
     }
 }
+
+window.addEventListener('resize', handleResize);
+window.addEventListener('orientationchange', handleResize);
 
 // Add loading animation with sharingan effect
 window.addEventListener('load', () => {

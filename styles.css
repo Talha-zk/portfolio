@@ -234,9 +234,10 @@ body::after {
     font-size: 2rem;
 }
 
+/* Orientation warning disabled - causing issues on mobile */
 @media (orientation: portrait) and (max-width: 768px) {
     .orientation-warning {
-        display: flex;
+        display: none !important;
     }
 }
 
